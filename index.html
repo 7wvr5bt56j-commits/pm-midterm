@@ -1,0 +1,945 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>PM Midterm Trainer</title>
+<meta name="description" content="Lernen und Quizze für die Project-Management-Midterm an der ESCA">
+<meta name="theme-color" content="#0B4D3C">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="PM Midterm">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
+<style>
+:root { padding-top: env(safe-area-inset-top, 0px) }
+/* Layout: a phone-first exam notebook. One column, iOS-style tab bar fixed at the bottom, ESCA green as the only accent */
+:root {
+  --bg: #F2F5F3;
+  --card: #FFFFFF;
+  --ink: #13211C;
+  --muted: #5B6B64;
+  --line: #D6E0DB;
+  --accent: #0B4D3C;
+  --accent-soft: #E1EEE8;
+  --navy: #1C2B57;
+  --good: #1F7A4D; --good-bg: #E2F3E9;
+  --mid: #9A6A08;  --mid-bg: #FBF0D9;
+  --bad: #B23A2E;  --bad-bg: #FBE6E3;
+  --f-ui: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --f-display: ui-rounded, -apple-system, "SF Pro Rounded", "Segoe UI", Roboto, sans-serif;
+  --f-num: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  --tabh: 58px;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #0C1412; --card: #15201D; --ink: #E4EDE9; --muted: #98ADA5; --line: #283833;
+  --accent: #5CC59E; --accent-soft: #17302A; --navy: #A5B6EA;
+  --good: #5FD29A; --good-bg: #123026; --mid: #E7B657; --mid-bg: #33280F; --bad: #F08A7E; --bad-bg: #3A1D1A;
+  color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #0C1412; --card: #15201D; --ink: #E4EDE9; --muted: #98ADA5; --line: #283833;
+  --accent: #5CC59E; --accent-soft: #17302A; --navy: #A5B6EA;
+  --good: #5FD29A; --good-bg: #123026; --mid: #E7B657; --mid-bg: #33280F; --bad: #F08A7E; --bad-bg: #3A1D1A;
+  color-scheme: dark }
+
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent }
+html, body { background: var(--bg) }
+body { color: var(--ink); font-family: var(--f-ui); font-size: 16px; line-height: 1.45; margin: 0; -webkit-text-size-adjust: 100% }
+#view { max-width: 680px; margin: 0 auto; padding-inline: 16px; padding-block: 12px calc(var(--tabh) + 32px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 16px }
+button { font: inherit; color: inherit }
+button:focus-visible { outline: 2px solid var(--navy); outline-offset: 2px }
+h1 { font-family: var(--f-display); font-weight: 700; font-size: clamp(28px, 7.5vw, 36px); line-height: 1.08; margin: 0; letter-spacing: -.01em; text-wrap: balance }
+h2 { font-size: 13px; text-transform: uppercase; letter-spacing: .07em; color: var(--muted); margin: 0 0 8px; font-weight: 600 }
+h2 small { display: block; text-transform: none; letter-spacing: 0; font-weight: 400; font-size: 13px }
+h3 { font-family: var(--f-display); font-size: 18px; margin: 18px 0 8px }
+.eyebrow { margin: 0 0 4px; font-size: 12px; text-transform: uppercase; letter-spacing: .09em; color: var(--accent); font-weight: 700 }
+.top { display: grid; gap: 6px; padding-top: 8px }
+.sub { margin: 0; color: var(--muted) }
+.meta { margin: 0; font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums }
+.meter, .prog { height: 6px; background: var(--accent-soft); border-radius: 3px; overflow: hidden }
+.meter i, .prog i { display: block; height: 100%; background: var(--accent); transition: width .3s }
+
+.list { display: grid; background: var(--card); border: 1px solid var(--line); border-radius: 14px; overflow: hidden }
+.row { display: grid; grid-template-columns: 44px 1fr auto; gap: 10px; align-items: center; text-align: left; background: none; border: 0; border-bottom: 1px solid var(--line); padding: 12px 14px; cursor: pointer; min-height: 56px }
+.row:last-child { border-bottom: 0 }
+.row:active { background: var(--accent-soft) }
+.num { font-family: var(--f-num); font-size: 14px; color: var(--accent); font-weight: 600 }
+.rt { min-width: 0; font-weight: 600; font-size: 15.5px; line-height: 1.3 }
+.rt small { display: block; font-weight: 400; color: var(--muted); font-size: 13px; margin-top: 2px }
+.pill { font-size: 12.5px; font-weight: 600; padding: 3px 9px; border-radius: 999px; background: var(--accent-soft); color: var(--muted); white-space: nowrap; font-variant-numeric: tabular-nums }
+.pill.good { background: var(--good-bg); color: var(--good) } .pill.mid { background: var(--mid-bg); color: var(--mid) } .pill.low { background: var(--bad-bg); color: var(--bad) }
+
+.grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px }
+@media (max-width: 380px) { .grid { grid-template-columns: repeat(3, 1fr) } }
+.tile { display: grid; gap: 2px; justify-items: start; padding: 12px; background: var(--card); border: 1px solid var(--line); border-radius: 14px; cursor: pointer; text-align: left }
+.tile .tn { font-family: var(--f-display); font-weight: 700; font-size: 26px; line-height: 1; font-variant-numeric: tabular-nums }
+.tile .ts { font-weight: 600; font-size: 14px; font-variant-numeric: tabular-nums }
+.tile .tt { font-size: 12px; color: var(--muted) }
+.tile.good { border-color: var(--good); background: var(--good-bg) } .tile.good .ts { color: var(--good) }
+.tile.mid { border-color: var(--mid); background: var(--mid-bg) } .tile.mid .ts { color: var(--mid) }
+.tile.low { border-color: var(--bad); background: var(--bad-bg) } .tile.low .ts { color: var(--bad) }
+
+.btn { border: 0; border-radius: 12px; padding: 14px 18px; background: var(--accent); color: var(--card); font-weight: 650; font-size: 16px; cursor: pointer; min-height: 50px }
+.btn.ghost { background: transparent; color: var(--accent); border: 1px solid var(--line) }
+.btn.wide { width: 100% }
+.cta { display: grid; gap: 10px }
+.hint { margin: 0; font-size: 13px; color: var(--muted) }
+.empty { background: var(--card); border: 1px dashed var(--line); border-radius: 14px; padding: 20px }
+.empty p { margin: 0 0 6px }
+.big { font-family: var(--f-display); font-weight: 700; font-size: 56px; line-height: 1; color: var(--accent); font-variant-numeric: tabular-nums }
+.big small { display: block; font-family: var(--f-ui); font-size: 14px; font-weight: 500; color: var(--muted); margin-top: 6px }
+
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 3; display: flex; justify-content: space-between; align-items: center; gap: 8px; background: var(--bg); padding-block: 8px; font-size: 14px; color: var(--muted); font-weight: 600 }
+.bar span { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap }
+.back { background: none; border: 0; color: var(--accent); font-weight: 600; font-size: 16px; padding: 6px 0; cursor: pointer }
+.back::before { content: "‹ "; font-size: 20px; line-height: 0 }
+
+.learn { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 18px; min-width: 0 }
+.learn p { margin: 0 0 10px; max-width: 65ch }
+.learn .lead { font-size: 17px; font-weight: 600; color: var(--navy); margin-top: 8px }
+.learn table, .brk, .nett table { width: 100%; border-collapse: collapse; font-size: 14px; margin: 4px 0 12px }
+.learn th, .learn td, .brk th, .brk td, .nett th, .nett td { text-align: left; vertical-align: top; padding: 7px 8px; border-bottom: 1px solid var(--line) }
+.learn th, .brk th, .nett th { font-size: 12px; text-transform: uppercase; letter-spacing: .04em; color: var(--muted); font-weight: 600 }
+.learn td:first-child { font-weight: 600 }
+.learn { overflow-x: auto }
+.def { border: 1px solid var(--line); background: var(--accent-soft); border-radius: 12px; padding: 12px 14px; margin: 10px 0 12px; font-style: italic }
+.def span { display: block; font-style: normal; font-size: 12px; text-transform: uppercase; letter-spacing: .07em; color: var(--accent); font-weight: 700; margin-bottom: 4px }
+.trap, .mem { border-radius: 12px; padding: 12px 14px; margin: 12px 0; font-size: 15px }
+.trap { background: var(--mid-bg); border: 1px solid var(--mid) }
+.mem { background: var(--accent-soft); border: 1px solid var(--line) }
+.net { overflow-x: auto; margin: 8px 0 12px }
+.net svg { width: 100%; max-width: 460px; height: auto; display: block }
+.net .ln path, .net .ln2 { fill: none; stroke: var(--muted); stroke-width: 1.4 }
+.net .ah { fill: var(--muted) }
+.net .nd rect { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.2 }
+.net .tx text { fill: var(--ink); font: 600 13px var(--f-ui); text-anchor: middle }
+
+.qhead { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; font-weight: 600 }
+.qhead span:last-child { text-align: right; min-width: 0 }
+.q { font-family: var(--f-display); font-size: clamp(19px, 5vw, 22px); font-weight: 650; line-height: 1.3; margin: 0; text-wrap: pretty }
+.nett { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 4px 10px; overflow-x: auto; font-variant-numeric: tabular-nums }
+.nett table { margin: 0 }
+.nett tr:last-child td { border-bottom: 0 }
+.opts { display: grid; gap: 10px }
+.opt { display: grid; grid-template-columns: 30px 1fr; gap: 12px; align-items: start; text-align: left; background: var(--card); border: 1.5px solid var(--line); border-radius: 14px; padding: 13px 14px; cursor: pointer; font-size: 16px; line-height: 1.35; min-height: 54px }
+.opt .k { width: 28px; height: 28px; border-radius: 8px; display: grid; place-items: center; background: var(--accent-soft); color: var(--accent); font-weight: 700; font-size: 14px }
+.opt:disabled { cursor: default; opacity: 1 }
+.opt.right { border-color: var(--good); background: var(--good-bg) } .opt.right .k { background: var(--good); color: var(--card) }
+.opt.wrong { border-color: var(--bad); background: var(--bad-bg) } .opt.wrong .k { background: var(--bad); color: var(--card) }
+.why { display: grid; gap: 4px; border-radius: 12px; padding: 12px 14px; background: var(--good-bg); border: 1px solid var(--good); font-size: 15px }
+.why.bad { background: var(--bad-bg); border-color: var(--bad) }
+.result { display: grid; gap: 8px } .result p { margin: 0 }
+.brk { background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden }
+.brk td.n { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap }
+.brk tr.weak td { color: var(--bad); font-weight: 600 }
+.rh { margin-top: 8px }
+.miss { display: grid; gap: 12px }
+.miss > div { background: var(--card); border: 1px solid var(--line); border-left: 4px solid var(--bad); border-radius: 12px; padding: 12px 14px; display: grid; gap: 6px; min-width: 0 }
+.miss p { margin: 0 } .miss .a { color: var(--muted); font-size: 14.5px }
+
+.tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: 10; display: grid; grid-template-columns: repeat(3, 1fr); background: color-mix(in srgb, var(--card) 92%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px) }
+.tab { background: none; border: 0; height: var(--tabh); display: grid; place-items: center; align-content: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--muted); cursor: pointer }
+.tab svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round }
+.tab[aria-selected="true"] { color: var(--accent) }
+@media (prefers-reduced-motion: reduce) { .meter i, .prog i { transition: none } }
+
+</style>
+</head>
+<body>
+<main id="view" aria-live="polite"></main>
+<nav class="tabs" aria-label="Bereiche">
+  <button class="tab" data-tab="learn" aria-selected="true" type="button"><svg viewBox="0 0 24 24"><path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v16H5.5c-.8 0-1.5-.7-1.5-1.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v16h5.5c.8 0 1.5-.7 1.5-1.5z"/></svg>Lernen</button>
+  <button class="tab" data-tab="quiz" aria-selected="false" type="button"><svg viewBox="0 0 24 24"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg>Quizze</button>
+  <button class="tab" data-tab="wrong" aria-selected="false" type="button"><svg viewBox="0 0 24 24"><path d="M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18z"/><path d="M9 9l6 6M15 9l-6 6"/></svg>Fehler</button>
+</nav>
+
+<script>
+// Content for the PM Midterm app. Questions in English (exam language), explanations in German.
+// Question format: [question, [4 options], correctIndex, explanation]
+
+const CHAPTERS = [
+  { id: "k1", title: "Kapitel 1", sub: "Fundamental concepts, governance, delivery approaches" },
+  { id: "k2", title: "Kapitel 2", sub: "Initiation and integrated project planning" }
+];
+
+const SECTIONS = [
+/* ---------------------------------------------------------------- 1.1 */
+{ id: "1.1", ch: "k1", title: "Was ist ein Projekt?",
+learn: `
+<p class="lead">Ein Projekt ist zeitlich begrenzt, verfolgt ein Ziel und liefert ein einmaliges Ergebnis.</p>
+<div class="def"><span>Kleim &amp; Ludin (1998)</span>A project is a coherent set of activities carried out in a logical sequence to achieve a specific result.</div>
+<h3>Die 4 Merkmale</h3>
+<table><tr><th>Merkmal</th><th>Bedeutung</th></tr>
+<tr><td>Purposeful</td><td>Reagiert auf einen Bedarf, hat ein finales Ziel</td></tr>
+<tr><td>Temporary</td><td>Hat einen Anfang und ein Ende</td></tr>
+<tr><td>Methodical</td><td>Koordiniert eine Menge von Aktivitäten</td></tr>
+<tr><td>Cross-functional</td><td>Bringt Leute aus verschiedenen Fachbereichen zusammen</td></tr></table>
+<h3>Die 3 Dimensionen: das "quality triangle"</h3>
+<p>Scope (auch quality oder perimeter), Time und Resources bestimmen die Performance eines Projekts. Ein Projekt baut <b>progressively and systematically</b> eine Realität auf.</p>
+<div class="trap"><b>Falle:</b> In der Literatur heißt das Dreieck meist "iron triangle" oder "triple constraint". In diesem Kurs heißt es "quality triangle". Stakeholders, Risk oder Cost sind hier keine der drei Dimensionen.</div>
+<div class="mem"><b>Merkhilfe:</b> P-T-M-C = Purpose, Time, Method, Cross. Das Gegenteil von allem ist "repetitive".</div>`,
+q: [
+["Kleim and Ludin (1998): \"A project is a coherent set of activities carried out in a logical sequence to achieve ...\"",["a specific result","continuous profit","operational stability","a strategic portfolio"],0,"Die Definition endet mit \"a specific result\". Ein Projekt hat ein konkretes, einmaliges Ziel."],
+["Which of the following is NOT a characteristic of a project according to the course?",["Purposeful","Temporary","Repetitive","Cross-functional"],2,"Die vier Merkmale sind Purposeful, Temporary, Methodical, Cross-functional. Repetitive beschreibt Operations."],
+["Which characteristic means that a project brings together members from different areas of expertise?",["Methodical","Cross-functional","Purposeful","Temporary"],1,"Cross-functional = verschiedene Fachbereiche. Methodical = Koordination von Aktivitäten."],
+["\"A project responds to a need and has a final objective.\" Which characteristic is this?",["Purposeful","Methodical","Temporary","Cross-functional"],0,"Bedarf plus finales Ziel = Purposeful."],
+["\"A project involves coordinating a set of activities.\" Which characteristic is this?",["Temporary","Methodical","Purposeful","Cross-functional"],1,"Koordination von Aktivitäten = Methodical."],
+["A project having a defined beginning and end corresponds to which characteristic?",["Purposeful","Methodical","Temporary","Cross-functional"],2,"Anfang und Ende = Temporary."],
+["The three dimensions of the \"quality triangle\" are:",["Cost, risk, quality","Scope, time, resources","Time, people, budget","Scope, risk, stakeholders"],1,"Laut Folie: Scope (quality / perimeter), Time, Resources."],
+["Which is NOT one of the three dimensions that define project performance in the course?",["Scope","Time","Resources","Stakeholders"],3,"Die drei Dimensionen sind Scope, Time, Resources. Stakeholders gehören nicht dazu."],
+["In the quality triangle, the scope dimension is also labelled as:",["Quality / perimeter","Budget / cost","Risk / uncertainty","Team / people"],0,"Auf der Folie steht Scope / Quality / Perimeter als eine Achse."],
+["According to the course, a project consists of building a reality ...",["randomly and quickly","progressively and systematically","once and permanently","continuously and repetitively"],1,"Wörtlich: progressively and systematically building a reality."],
+["In Kleim and Ludin's definition, project activities are carried out in:",["a logical sequence","random order","a continuous loop","parallel only"],0,"\"carried out in a logical sequence\"."],
+["Which description best fits a project?",["A repetitive activity ensuring normal functioning","A temporary activity with a start and an end producing a unique result","A permanent department of the company","A continuous production process"],1,"Projekt = temporär, Anfang und Ende, einmaliges Ergebnis."]
+]},
+/* ---------------------------------------------------------------- 1.2 */
+{ id: "1.2", ch: "k1", title: "Projekt vs. Operation, Programme, Portfolio",
+learn: `
+<p class="lead">Ein Projekt schafft etwas Neues und endet. Eine Operation hält das Bestehende am Laufen und wiederholt sich.</p>
+<table><tr><th>Kriterium</th><th>Project</th><th>Operation</th></tr>
+<tr><td>Environment</td><td>Unknown, innovative, temporary organization</td><td>Repetitive, stable organization</td></tr>
+<tr><td>Process</td><td>Irreversible decisions</td><td>Reversible decisions</td></tr>
+<tr><td>Uncertainty</td><td>High, exogenous variables, degrees of freedom</td><td>Low, endogenous variables, structured actions</td></tr>
+<tr><td>Cash flow</td><td>Negative: erst investieren, dann Return</td><td>Positive: erzeugt Gewinn</td></tr>
+<tr><td>Activities</td><td>Schafft zukünftige Aktivitäten, sichert die Zukunft</td><td>Erhält bestehende Aktivitäten, hält die Firma am Leben</td></tr>
+<tr><td>Difficulty</td><td>Complex "leap into the unknown"</td><td>Schnell eingreifen bei Engpass oder Ausfall</td></tr>
+<tr><td>Beispiel</td><td>Building a bridge</td><td>Regular maintenance of the bridge</td></tr></table>
+<h3>Die Ebenen der Arbeit</h3>
+<table><tr><th>Begriff</th><th>Definition</th></tr>
+<tr><td>Project</td><td>Temporär, klarer Start und Ende, baut ein bestimmtes Ding</td></tr>
+<tr><td>Programme</td><td>Gruppe verbundener Projekte für ein größeres strategisches Ziel</td></tr>
+<tr><td>Portfolio</td><td>Höchste Ebene: alle Arbeit, entscheidet wo Geld investiert wird</td></tr>
+<tr><td>Operations</td><td>Tägliche, wiederholte Arbeit, läuft unbegrenzt</td></tr></table>
+<div class="mem"><b>Signalwörter:</b> build, develop, design, launch, conduct a study = Project. Manage, maintain, produce, every year = Operation.</div>
+<div class="trap"><b>Falle:</b> Ein Trainingsprogramm einmal <i>designen</i> ist ein Projekt. Neue Mitarbeiter <i>jedes Jahr</i> schulen ist eine Operation.</div>`,
+q: [
+["Which statement describes an operation rather than a project?",["Irreversible decisions","Negative cash flow","Low uncertainty with endogenous variables","Temporary organization"],2,"Operations: niedrige Unsicherheit, endogene Variablen. Die anderen drei sind Projektmerkmale."],
+["Why is the cash flow of a project typically negative?",["Projects never generate revenue","You must invest before getting a return","Projects are always over budget","Operations absorb the profit"],1,"Projekt = erst investieren, dann Return."],
+["Decisions taken within a project are described as:",["Reversible","Irreversible","Endogenous","Repetitive"],1,"Projekt: irreversible decisions. Operation: reversible."],
+["Which example from the course illustrates an operation?",["Building a bridge","Developing a mobile app","Regular maintenance of the bridge","Conducting a market study"],2,"Building a bridge (Projekt) vs. regular maintenance (Operation)."],
+["The environment of a project is described as:",["Repetitive and stable","Unknown, innovative, temporary organization","Fully predictable","Permanent and hierarchical"],1,"Projekt: unknown, innovative, temporary organization."],
+["The typical difficulty of an operation is:",["Managing a leap into the unknown","Intervening quickly in case of a bottleneck or breakdown","Writing a business case","Building a new organization"],1,"Operation: schnell eingreifen bei Engpass. Projekt: leap into the unknown."],
+["Which activities does a project create, according to the comparison table?",["Activities that keep the company alive today","Future activities that secure the company's future","Daily maintenance routines","Reversible decisions"],1,"Projekte schaffen zukünftige Aktivitäten. Operations halten das Bestehende am Leben."],
+["An operation is best defined as:",["A temporary activity producing a unique result","A repetitive and continuous activity ensuring the normal functioning of an organization","A group of related projects","The highest level of investment decisions"],1,"Operation = repetitive, continuous, normal functioning."],
+["A group of connected projects managed together for a bigger strategic goal is a:",["Portfolio","Programme","Operation","Work package"],1,"Programme = verbundene Projekte, gemeinsames strategisches Ziel."],
+["Which level is used to decide where to invest money across all work?",["Project","Programme","Portfolio","Operations"],2,"Portfolio ist die höchste Ebene, dort wird über Investitionen entschieden."],
+["\"The daily, repetitive work that keeps the business running indefinitely\" defines:",["A project","A programme","Operations","A portfolio"],2,"Operations laufen unbegrenzt und wiederholen sich."],
+["Which order goes from the broadest to the narrowest level?",["Project, Programme, Portfolio","Portfolio, Programme, Project","Programme, Portfolio, Project","Portfolio, Project, Programme"],1,"Portfolio umfasst Programme, Programme umfassen Projekte."],
+["\"Train new employees every year\" is best classified as:",["A project, because training has a goal","An operation, because it recurs every year","A programme","A portfolio decision"],1,"\"every year\" = wiederkehrend, also Operation."],
+["\"Design an online training program\" is best classified as:",["An operation","A project","A portfolio","Maintenance"],1,"Einmaliges Design mit Start und Ende = Projekt."],
+["\"Conduct a market study to launch a new product\" is:",["A project","An operation","A portfolio","A routine task"],0,"Einmalig mit konkretem Ziel = Projekt."],
+["\"Produce cars in a factory\" is:",["A project","An operation","A programme","A work package"],1,"Serienproduktion wiederholt sich = Operation."],
+["\"Manage a company's customer service\" is:",["A project","An operation","A programme","A stage gate"],1,"Dauerhaft und wiederholt = Operation."],
+["Uncertainty in a project is characterised by:",["Low uncertainty and structured actions","High uncertainty, exogenous variables and degrees of freedom","No uncertainty","Endogenous variables only"],1,"Projekt: hohe Unsicherheit, exogene Variablen, Freiheitsgrade."]
+]},
+/* ---------------------------------------------------------------- 1.3 */
+{ id: "1.3", ch: "k1", title: "Projektmanagement: Definitionen, Administration vs. Management",
+learn: `
+<p class="lead">Drei Autoren definieren Projektmanagement. Jede Definition hat ein Erkennungswort, nach dem in MCQs gefragt wird.</p>
+<table><tr><th>Autor</th><th>Kern</th><th>Erkennungswort</th></tr>
+<tr><td>Picq (2011)</td><td>Principles, methods, tools to steer and coordinate a project; strategic, organizational and human stakes; innovation and learning</td><td>human stakes</td></tr>
+<tr><td>Garel (2013)</td><td>Not limited to task management; a temporary organizational mode; learning and risk management</td><td>temporary organizational mode</td></tr>
+<tr><td>Kleim &amp; Ludin (1998)</td><td>Tools, techniques, processes to define, plan, organize, control and direct a project</td><td>define, plan, organize, control, direct</td></tr></table>
+<h3>Administration (Gestion) vs. Strategic Management</h3>
+<table><tr><th></th><th>Administration</th><th>Strategic Management</th></tr>
+<tr><td>Focus</td><td>Organization, task tracking, performance</td><td>Strategic vision, leadership, motivation</td></tr>
+<tr><td>Role</td><td>Plan, execute, deliver</td><td>Inspire, anticipate, align with strategy</td></tr>
+<tr><td>Tools</td><td>Gantt, Scrum, Kanban, Risk Matrix</td><td>Communication, persuasion, holistic vision</td></tr>
+<tr><td>Responsibility</td><td>Deadlines, budget, resources</td><td>Stakeholder engagement, change leadership</td></tr>
+<tr><td>Ultimate goal</td><td>Completing a project successfully</td><td>Project success aligned with the corporate vision</td></tr></table>
+<h3>Je 4 Aktionen</h3>
+<p><b>Administration</b> fokussiert auf <b>activities</b>: Estimation, Organization, Planning, Monitoring (Tracking).</p>
+<p><b>Strategic Management</b> fokussiert auf <b>people</b>: Mobilization (team engagement), Management (leadership), Communication, Steering (governance).</p>
+<div class="trap"><b>Falle:</b> Gantt, Scrum, Kanban und Risk Matrix sind laut Folie Werkzeuge der Administration, auch wenn Scrum "agil" klingt.</div>`,
+q: [
+["\"Project management is not limited to task management; it is a temporary organizational mode...\" This definition is by:",["Picq (2011)","Kleim and Ludin (1998)","Garel (2013)","PMBOK"],2,"Erkennungswort \"temporary organizational mode\" = Garel."],
+["Which author defines project management through strategic, organizational and human stakes plus innovation and learning?",["Picq (2011)","Garel (2013)","Kleim and Ludin (1998)","PMBOK"],0,"Picq betont strategic, organizational, human stakes."],
+["\"Tools, techniques and processes used to define, plan, organize, control and direct a project\" is the definition by:",["Picq","Garel","Kleim and Ludin","Thierry Garel"],2,"Die Verbenliste = Kleim und Ludin."],
+["In which year did Picq publish the definition used in the course?",["1998","2006","2011","2013"],2,"Picq 2011, Garel 2013, Kleim und Ludin 1998."],
+["Which tool belongs to project administration rather than strategic project management?",["Persuasion","Kanban","Holistic vision","Stakeholder engagement"],1,"Gantt, Scrum, Kanban, Risk Matrix = Administration."],
+["Which of these is one of the four actions of strategic project management?",["Estimation","Monitoring","Steering","Planning"],2,"Management: Mobilization, Management, Communication, Steering."],
+["Which is NOT one of the four actions of project administration?",["Estimation","Organization","Mobilization","Monitoring"],2,"Administration: Estimation, Organization, Planning, Monitoring. Mobilization ist Management."],
+["Strategic project management focuses mainly on:",["Activities","People","Budgets","Tools"],1,"Administration = activities, Management = people."],
+["The ultimate goal of strategic project management is:",["Completing tasks on time","Ensuring project success in alignment with the corporate vision","Minimising stakeholders","Producing the Gantt chart"],1,"Erfolg im Einklang mit der Unternehmensvision."],
+["Stakeholder engagement and change leadership are the responsibility of:",["Project administration","Strategic project management","The supplier","The PMO only"],1,"Responsibility im Management: stakeholder engagement, change leadership."],
+["\"Plan, execute, deliver\" describes the role of:",["Project administration","Strategic project management","The sponsor","The regulator"],0,"Rolle der Administration: plan, execute, deliver."],
+["\"Inspire, anticipate, align with strategy\" describes the role of:",["Project administration","Strategic project management","The PMO","Operations"],1,"Rolle des Strategic Management."],
+["Managing deadlines, budget and resources is the responsibility of:",["Project administration","Strategic project management","The end-users","The regulators"],0,"Responsibility der Administration."],
+["A Gantt chart is a tool of:",["Strategic project management","Project administration","Governance only","Benefits realization"],1,"Gantt steht in der Tools-Zeile der Administration."],
+["\"How would you influence the overall direction of the project and ensure its alignment with organizational objectives?\" This is the task of the:",["Project administration team","Project management team","Supplier","Quality inspector"],1,"Richtung und Alignment = strategisches Management (Gruppe 2 der Aktivität)."],
+["Tracking the budget daily and running daily stand-ups is typical of:",["Project administration","Strategic project management","Portfolio management","Benefits realization"],0,"Tägliche Steuerung von Aufgaben und Budget = Administration."]
+]},
+/* ---------------------------------------------------------------- 1.4 */
+{ id: "1.4", ch: "k1", title: "PM-Funktionen und PMBOK-Phasen",
+learn: `
+<p class="lead">Projektmanagement hat 6 Funktionen und läuft laut PMBOK in 5 Phasen ab.</p>
+<h3>6 Functions</h3>
+<table><tr><th>Function</th><th>Kern</th></tr>
+<tr><td>Direct</td><td>Das Projekt über den gesamten Lifecycle führen</td></tr>
+<tr><td>Define</td><td>Ziele so festlegen, dass alle zustimmen und wissen, woran man Erfolg erkennt</td></tr>
+<tr><td>Plan</td><td>Eine Roadmap, der alle mit Vertrauen folgen, nicht nur der PM</td></tr>
+<tr><td>Organize</td><td>Effizienz und Effektivität des Teams steigern, höhere Produktivität</td></tr>
+<tr><td>Control</td><td>Verhindern, dass Momentum und Richtung durch "scope creep" verloren gehen</td></tr>
+<tr><td>Close</td><td>Geordnet beenden statt im Chaos</td></tr></table>
+<h3>5 PMBOK Phasen (genau so auf der Folie)</h3>
+<table><tr><th>Phase</th><th>Inhalte laut Folie</th></tr>
+<tr><td>Initiation</td><td>Vision, goals, objectives, scope, responsibilities, expected outcomes. <b>Requirements specification.</b></td></tr>
+<tr><td>Planning</td><td>Develop the <b>WBS</b> and the project's start and completion</td></tr>
+<tr><td>Execution</td><td><b>Team formation, resource allocation, cost estimation, risk assessment</b>, preparation of project documentation, ensuring effective communication</td></tr>
+<tr><td>Control</td><td>Collection and evaluation of status reports, management of changes to the baseline, responding to circumstances that may negatively affect participants</td></tr>
+<tr><td>Closing</td><td>Compilation of statistics, release of personnel, lessons-learned document</td></tr></table>
+<div class="trap"><b>Falle:</b> Nach allgemeinem PM-Wissen würde man Cost estimation und Risk assessment in Planning erwarten. Die Folie ordnet sie <b>Execution</b> zu. Requirements specification steht bei <b>Initiation</b>. In der Klausur gilt die Folie.</div>
+<div class="mem"><b>Merkhilfe:</b> Planning hat auf der Folie nur zwei Dinge: WBS sowie Start und Ende. Alles mit Team, Ressourcen, Kosten und Risiko ist Execution.</div>`,
+q: [
+["Which project management function keeps the project from being overtaken by scope creep?",["Define","Organize","Control","Close"],2,"Control sichert Momentum und Richtung gegen scope creep."],
+["Which function aims at a roadmap people follow with confidence, not just the project manager?",["Plan","Direct","Define","Organize"],0,"Plan = Roadmap, der alle vertrauen."],
+["Which function sets goals so that everyone agrees on the outcomes and knows how to recognize success?",["Define","Plan","Direct","Close"],0,"Define = Ziele und Erfolgskriterien klären."],
+["Which function increases the efficiency and effectiveness of the team, resulting in greater productivity?",["Control","Organize","Close","Define"],1,"Organize = Effizienz und Effektivität des Teams."],
+["Which function makes sure a project ends smoothly rather than in chaos?",["Control","Direct","Close","Plan"],2,"Close = geordnetes Ende."],
+["Which function means leading a project throughout its entire lifecycle?",["Direct","Define","Organize","Control"],0,"Direct = über den ganzen Lifecycle führen."],
+["How many project management functions are presented in the course?",["4","5","6","8"],2,"Define, Plan, Organize, Control, Direct, Close = 6."],
+["According to the PMBOK phases slide, developing the work breakdown structure happens in:",["Initiation","Planning","Execution","Closing"],1,"Planning auf der Folie: WBS sowie Start und Ende des Projekts."],
+["Preparing a lessons-learned document happens in:",["Control","Execution","Planning","Closing"],3,"Closing: statistics, release of personnel, lessons learned."],
+["Management of changes to the baseline belongs to:",["Initiation","Planning","Control","Closing"],2,"Control: status reports, changes zur Baseline."],
+["Determining the overall vision, goals, scope and expected outcomes happens in:",["Initiation","Planning","Execution","Control"],0,"Initiation."],
+["According to the course slide, requirements specification belongs to:",["Initiation","Planning","Execution","Control"],0,"Auf der Folie steht Requirements specification unter Initiation."],
+["According to the course slide, team formation belongs to:",["Initiation","Planning","Execution","Closing"],2,"Team formation steht auf der Folie unter Execution."],
+["According to the course slide, risk assessment and cost estimation belong to:",["Initiation","Planning","Execution","Closing"],2,"Die Folie listet Cost estimation und Risk assessment unter Execution."],
+["Release of personnel happens in:",["Execution","Control","Closing","Initiation"],2,"Closing."],
+["Ensuring effective communication is listed under:",["Initiation","Planning","Execution","Closing"],2,"Execution."],
+["What is the correct order of the PMBOK phases in the course?",["Initiation, Planning, Execution, Control, Closing","Planning, Initiation, Execution, Closing, Control","Initiation, Execution, Planning, Control, Closing","Planning, Execution, Initiation, Control, Closing"],0,"Initiation, Planning, Execution, Control, Closing."],
+["\"Responding to circumstances that may negatively affect project participants\" belongs to:",["Initiation","Control","Closing","Planning"],1,"Control."],
+["Collection and evaluation of status reports belongs to:",["Execution","Control","Closing","Initiation"],1,"Control."],
+["Resource allocation is listed by the course under:",["Initiation","Planning","Execution","Closing"],2,"Execution, zusammen mit Team formation und Cost estimation."]
+]},
+/* ---------------------------------------------------------------- 1.5 */
+{ id: "1.5", ch: "k1", title: "Project Governance und der Boeing-Case",
+learn: `
+<p class="lead">Governance ist der Rahmen, in dem Projektentscheidungen fallen. Die Folie nennt sie eine "temporary constitution" für das Projekt.</p>
+<p>Sie legt fest, <b>wer die Autorität</b> zu entscheiden hat, <b>wer verantwortlich</b> für die Ergebnisse ist und <b>wie Risiken gesteuert</b> werden.</p>
+<h3>Die 3 Säulen</h3>
+<table><tr><th>Säule</th><th>Inhalt</th><th>Leitfrage</th></tr>
+<tr><td>Structure</td><td>Project sponsor, steering committee, PMO</td><td>Wer?</td></tr>
+<tr><td>Process</td><td>Stage gates, change control, escalation thresholds</td><td>Wie läuft es ab?</td></tr>
+<tr><td>Information</td><td>Status reporting, independent audits</td><td>Was wird berichtet und geprüft?</td></tr></table>
+<h3>Case: Boeing 737 MAX</h3>
+<p><b>1. Pressure:</b> 2011 musste Boeing gegen ein neues Airbus-Flugzeug antreten. Management wollte Gewinne schützen und teures Simulatortraining für Airlines vermeiden, also aggressive Deadlines und Kostensenkung.</p>
+<p><b>2. Deception:</b> Größere Triebwerke erzeugten ein aerodynamisches Problem. Die versteckte Software MCAS sollte es ausgleichen. MCAS stand nicht in den Pilotenhandbüchern. Ingenieure mit Sicherheitsbedenken wurden ignoriert oder unter Druck gesetzt.</p>
+<p><b>3. Board breakdowns</b> (Verletzung der <b>Duty of Care</b>):</p>
+<table><tr><th>Versagen</th><th>Was genau</th></tr>
+<tr><td>Financial focus</td><td>Aktienrückkäufe und an den Kurs gekoppelte Boni statt Sicherheit</td></tr>
+<tr><td>Lack of expertise</td><td>Board aus Managern anderer Branchen, keine Luftfahrt- oder Sicherheitsexperten</td></tr>
+<tr><td>Information gap</td><td>Kein Safety Committee auf Board-Ebene, blindes Vertrauen in Management-Berichte</td></tr></table>
+<p><b>4. Fallout:</b> Zwei Abstürze 2018 und 2019, <b>20 Monate</b> weltweites Flugverbot, Milliardenverluste, Aktionäre verklagten das Board erfolgreich.</p>
+<div class="mem"><b>Verbindung zu den Säulen:</b> Structure versagte (Board ohne Expertise), Process versagte (Eskalation der Ingenieure blockiert), Information versagte (kein unabhängiges Reporting).</div>`,
+q: [
+["Project governance is described in the course as functioning like a:",["Temporary constitution for the project","Permanent operations manual","Marketing plan","Gantt chart"],0,"Temporary constitution."],
+["Stage gates and escalation thresholds belong to which governance pillar?",["Structure","Process","Information","Ethics"],1,"Process: stage gates, change control, escalation thresholds."],
+["Independent audits belong to which governance pillar?",["Structure","Process","Information","Sponsorship"],2,"Information: status reporting, independent audits."],
+["The steering committee belongs to which governance pillar?",["Structure","Process","Information","Execution"],0,"Structure: sponsor, steering committee, PMO."],
+["The PMO (project management office) belongs to which governance pillar?",["Structure","Process","Information","Closing"],0,"Structure."],
+["Change control belongs to which governance pillar?",["Structure","Process","Information","Benefits"],1,"Process."],
+["Status reporting belongs to which governance pillar?",["Structure","Process","Information","Scope"],2,"Information."],
+["How many core pillars of governance does the course present?",["2","3","4","5"],1,"Structure, Process, Information."],
+["Project governance defines:",["Who has authority to decide, who is accountable, and how risks are managed","The detailed task list","The marketing budget","The product design"],0,"Wörtlich von der Folie."],
+["In the Boeing 737 MAX case, the absence of a board-level safety committee is an example of:",["Financial focus","Information gap","Lack of expertise","Scope creep"],1,"Information gap."],
+["Boeing's board was made up of executives from outside industries with no aviation safety experts. This is:",["Lack of expertise","Information gap","Financial focus","Change control"],0,"Lack of expertise."],
+["Prioritising stock buybacks and bonuses linked to short-term share price is an example of:",["Information gap","Lack of expertise","Financial focus","Process failure"],2,"Financial focus."],
+["Which fiduciary duty did the Boeing board fail, according to the case?",["Duty of loyalty","Duty of care","Duty of disclosure to suppliers","Duty of competition"],1,"Duty of Care."],
+["What was MCAS in the Boeing case?",["A pilot training program","A hidden flight-control software added to fix an aerodynamic issue","A board committee","A new engine"],1,"MCAS = versteckte Flugsteuerungssoftware wegen der größeren Triebwerke."],
+["How long was the 737 MAX fleet grounded globally?",["6 months","12 months","20 months","36 months"],2,"20 Monate."],
+["Why did Boeing rush the 737 MAX in 2011?",["To meet a regulator's deadline","To compete with a new Airbus plane","To replace a failed project","To enter the car market"],1,"Konkurrenz zu einem neuen Airbus."],
+["Engineers who raised safety alerts were ignored or pressured to stay silent. Which governance pillar failed most directly?",["Process (escalation)","Benefits","Scope","Closing"],0,"Eskalation ist Teil des Process-Pfeilers (escalation thresholds)."],
+["Why did Boeing management avoid disclosing MCAS in pilot manuals?",["To avoid expensive flight simulator training for airlines","Because regulators forbade it","Because MCAS was not finished","To reduce engine size"],0,"Simulatortraining sollte vermieden werden, um Kosten und Zeit zu sparen."]
+]},
+/* ---------------------------------------------------------------- 1.6 */
+{ id: "1.6", ch: "k1", title: "Stakeholder nach PMBOK",
+learn: `
+<p class="lead">PMBOK teilt Stakeholder in 4 Gruppen. Jede Gruppe hat einen Spitznamen, der oft direkt abgefragt wird.</p>
+<table><tr><th>Gruppe</th><th>Spitzname</th><th>Wer</th></tr>
+<tr><td>Core project team</td><td>the creators</td><td>Project manager, project team</td></tr>
+<tr><td>Governance &amp; support</td><td>the decision makers</td><td>Project sponsor, PMO</td></tr>
+<tr><td>Beneficiaries</td><td>the target</td><td>Client / buyer, end-users</td></tr>
+<tr><td>External environment</td><td>the influencers</td><td>Suppliers / partners, regulators / authorities</td></tr></table>
+<div class="trap"><b>Falle:</b> Der Sponsor ist nicht im Core team, sondern bei Governance &amp; support. Der PM selbst ist im Core team. Regulatoren sind Influencers, keine Beneficiaries.</div>
+<div class="mem"><b>Merkhilfe:</b> Wer baut? Creators. Wer entscheidet? Decision makers. Für wen? Target. Wer wirkt von außen? Influencers.</div>`,
+q: [
+["According to PMBOK, the project sponsor belongs to:",["Core project team","Governance and support","Beneficiaries","External environment"],1,"Governance & support."],
+["Regulators and authorities are classified as:",["Beneficiaries","Core project team","External environment (the influencers)","Governance and support"],2,"External environment."],
+["End-users belong to which stakeholder group?",["Beneficiaries (the target)","Core project team","External environment","Governance and support"],0,"Beneficiaries."],
+["The PMO belongs to which stakeholder group?",["Core project team","Governance and support","Beneficiaries","External environment"],1,"Governance & support, zusammen mit dem Sponsor."],
+["The project manager belongs to:",["Core project team (the creators)","Governance and support","Beneficiaries","External environment"],0,"Core project team."],
+["Suppliers and partners belong to:",["Beneficiaries","External environment","Core project team","Governance and support"],1,"External environment."],
+["Which group is nicknamed \"the decision makers\"?",["Core project team","Governance and support","Beneficiaries","External environment"],1,"Governance & support."],
+["Which group is nicknamed \"the target\"?",["Beneficiaries","External environment","Core project team","Governance and support"],0,"Beneficiaries."],
+["Which group is nicknamed \"the influencers\"?",["Core project team","Beneficiaries","External environment","Governance and support"],2,"External environment."],
+["The client or buyer is part of:",["Beneficiaries","Governance and support","External environment","Core project team"],0,"Beneficiaries."],
+["How many stakeholder groups does the course list according to PMBOK?",["3","4","5","6"],1,"Vier Gruppen."],
+["Which group is nicknamed \"the creators\"?",["Core project team","Beneficiaries","Governance and support","External environment"],0,"Core project team."]
+]},
+/* ---------------------------------------------------------------- 1.7 */
+{ id: "1.7", ch: "k1", title: "Strategic alignment, Business case, Predictive / Agile / Hybrid",
+learn: `
+<p class="lead">Strategic alignment beantwortet das "why", der Business case das "how" und "how much".</p>
+<table><tr><th>Begriff</th><th>Frage</th><th>Inhalt</th></tr>
+<tr><td>Strategic alignment</td><td>Why?</td><td>Beweist, dass das Projekt die langfristigen Unternehmensziele unterstützt</td></tr>
+<tr><td>Business case</td><td>How? How much?</td><td>Begründungsdokument: Kosten, finanzieller Nutzen, Risiken, ROI</td></tr></table>
+<h3>Drei Vorgehensweisen</h3>
+<table><tr><th>Ansatz</th><th>Metapher</th><th>Planung</th></tr>
+<tr><td>Predictive</td><td>GPS route</td><td>Schwere Planung vorab, jede Abzweigung steht fest, bevor man losfährt</td></tr>
+<tr><td>Agile</td><td>Open-world video game</td><td>Just-in-time, nur der nächste Sprint (etwa zwei Wochen), Strategie nach Feedback der Nutzer anpassen</td></tr>
+<tr><td>Hybrid</td><td>Music festival</td><td>Starres predictive Gerüst für harte Deadlines (Datum, Ort, Hauptbühne), agile Freiräume für Details (Food trucks, Setlists)</td></tr></table>
+<h3>Creator-Studio-Aktivität</h3>
+<table><tr><th>Task</th><th>Ansatz</th><th>Warum</th></tr>
+<tr><td>Soundproof booths</td><td>Predictive</td><td>Physischer Bau, klare Spezifikation, Änderung teuer</td></tr>
+<tr><td>YouTube channel</td><td>Agile</td><td>Ergebnis unsicher, lebt von Zuschauerfeedback</td></tr>
+<tr><td>Furnishing and tech</td><td>Hybrid</td><td>Kauf fest planbar, Anordnung nach Feedback anpassbar</td></tr></table>
+<div class="mem"><b>Faustregel:</b> Je fester und teurer zu ändern, desto predictive. Je unsicherer und feedbackgetriebener, desto agile. Beides gemischt: hybrid.</div>`,
+q: [
+["The document that justifies a project by weighing costs, benefits, risks and ROI is the:",["Project charter","Scope statement","Business case","WBS"],2,"Business case."],
+["Strategic alignment answers which question?",["Why","How much","When","Who"],0,"Why."],
+["The business case answers which questions?",["Why and who","How and how much","When and where","What and who"],1,"How und how much."],
+["Which metaphor does the course use for the agile approach?",["GPS route","Open-world video game","Music festival","Building a bridge"],1,"Agile = open-world video game."],
+["Which metaphor does the course use for the predictive approach?",["GPS route","Open-world video game","Music festival","Food truck"],0,"Predictive = GPS route."],
+["Locking down the date, venue and main stage while keeping food trucks and setlists flexible describes:",["Predictive","Agile","Hybrid","Kanban"],2,"Hybrid = music festival."],
+["Building soundproof recording booths is best managed with:",["Agile","Predictive","Hybrid","No method"],1,"Physisch, fix, teuer zu ändern."],
+["Growing the studio's YouTube channel is best managed with:",["Predictive","Agile","A fixed Gantt chart only","Operations"],1,"Unsicher und feedbackgetrieben."],
+["Furnishing the studio and setting up the tech is best managed with:",["Predictive","Agile","Hybrid","Portfolio management"],2,"Kauf fest, Anordnung flexibel = Hybrid."],
+["Planning in the agile approach is described as:",["Heavy upfront mapping","Just-in-time choices for the next sprint","No planning at all","Planning only at closing"],1,"Just in time, nur der nächste Sprint."],
+["Planning in the predictive approach is described as:",["Heavy upfront mapping before starting","Planning only the next two weeks","Changing plans after each user feedback","No fixed destination"],0,"Alles vorab planen."],
+["In the course, an agile sprint is given as roughly:",["Two days","Two weeks","Two months","Two years"],1,"\"plan your next two weeks (or sprint)\"."],
+["Which approach builds a rigid predictive skeleton for hard deadlines and leaves agile spaces for experimentation?",["Predictive","Agile","Hybrid","Waterfall only"],2,"Hybrid."],
+["Strategic alignment proves that a project:",["Is cheaper than alternatives","Directly supports the company's long-term goals","Has no risks","Is finished on time"],1,"Unterstützt die langfristigen Unternehmensziele."]
+]},
+/* ---------------------------------------------------------------- 1.8 */
+{ id: "1.8", ch: "k1", title: "Success criteria, Benefits, Ethics, Sustainability",
+learn: `
+<p class="lead">Success criteria messen, ob die Targets getroffen wurden. Benefits zeigen, ob sich das Projekt gelohnt hat.</p>
+<table><tr><th>Begriff</th><th>Leitfrage oder Kern</th></tr>
+<tr><td>Success criteria</td><td>Spezifische, messbare Standards: "Did we hit our targets?"</td></tr>
+<tr><td>Benefits</td><td>Tatsächlicher Wert, langfristige positive Wirkung: "Was doing this project actually worth it?"</td></tr>
+<tr><td>Ethics</td><td>Das Richtige tun: professionelle Standards, Ehrlichkeit, Fairness, Accountability</td></tr>
+<tr><td>Sustainability</td><td>Keine Ressourcen erschöpfen, Umwelt nicht schädigen, Gesellschaft langfristig nicht schaden</td></tr></table>
+<h3>Beispiel</h3>
+<p>Eine App wird pünktlich und im Budget geliefert (Success criteria erfüllt). Nach einem Jahr nutzt sie niemand (kein Benefit).</p>
+<div class="trap"><b>Falle:</b> "On time, on budget" ist ein Success criterion, kein Benefit. "Höhere Kundenbindung über zwei Jahre" ist ein Benefit.</div>`,
+q: [
+["\"Did we hit our targets?\" refers to:",["Benefits","Success criteria","Sustainability","Strategic alignment"],1,"Success criteria."],
+["\"Was doing this project actually worth it?\" refers to:",["Success criteria","Benefits","Ethics","Scope"],1,"Benefits."],
+["Designing a project so that it does not deplete resources or harm society in the long run is:",["Ethics","Sustainability","Governance","Benefits"],1,"Sustainability."],
+["Sticking to professional standards, honesty, fairness and accountability is:",["Ethics","Sustainability","Benefits","Success criteria"],0,"Ethics."],
+["A project is delivered on time and on budget, but nobody uses the product. Which statement is correct?",["Success criteria met, benefits not realised","Benefits realised, success criteria missed","Both met","Neither met"],0,"Targets erreicht, aber kein Wert entstanden."],
+["Which of the following is a benefit rather than a success criterion?",["Delivered by 30 June","Stayed within a 50,000 budget","Customer retention increases over the next two years","All 12 features delivered"],2,"Langfristiger Wert = Benefit. Die anderen sind messbare Targets."],
+["Which of the following is a success criterion?",["The project is delivered within its approved budget","The company becomes market leader in ten years","Employees feel more motivated","Society benefits long term"],0,"Konkret messbares Target = Success criterion."],
+["Boeing hiding MCAS from pilot manuals is primarily a failure of:",["Sustainability","Ethics","Scope","Network logic"],1,"Unehrlichkeit gegenüber Piloten = Ethik-Verstoß."],
+["Choosing reusable materials to reduce environmental damage in a construction project relates to:",["Ethics","Sustainability","Success criteria","Network logic"],1,"Ressourcen und Umwelt = Sustainability."],
+["Benefits are best described as:",["The measurable standards of completion","The actual value or long-term positive impact created by the project","The project's budget","The list of deliverables"],1,"Benefits = tatsächlicher, langfristiger Wert."]
+]},
+/* ---------------------------------------------------------------- 2.1 */
+{ id: "2.1", ch: "k2", title: "Project charter",
+learn: `
+<p class="lead">Die Project charter ist das offizielle Dokument, das ein Projekt ins Leben ruft und dem Projektmanager Befugnis gibt.</p>
+<div class="def"><span>Definition</span>A project charter is an official document that authorizes the existence of a project and grants the project manager the authority to use organizational resources.</div>
+<h3>Key elements</h3>
+<table><tr><th>Element</th></tr>
+<tr><td>Business case</td></tr><tr><td>Project purpose and objectives</td></tr><tr><td>Scope and deliverables</td></tr>
+<tr><td>Stakeholders and roles</td></tr><tr><td>Milestones and budget</td></tr><tr><td>Risks, assumptions and constraints</td></tr></table>
+<h3>Template (Institute of Project Management)</h3>
+<p>Project title, description, project manager, level of authority, sponsor(s), project owner, product scope / deliverables, objectives, pre-assigned resources, stakeholders list, summary milestone schedule.</p>
+<div class="trap"><b>Falle:</b> Die Charter <i>enthält</i> den Business case als Element. Lessons learned, Float oder WBS-Work-packages gehören nicht in die Charter.</div>`,
+q: [
+["The document that authorizes the existence of a project and gives the PM authority to use organizational resources is the:",["Business case","Scope statement","Project charter","Requirements document"],2,"Project charter."],
+["Which is NOT a key element of a project charter listed in the course?",["Business case","Milestones and budget","Risks, assumptions and constraints","Lessons-learned document"],3,"Lessons learned entsteht in Closing."],
+["To whom does the project charter grant authority?",["The end-users","The project manager","The suppliers","The regulators"],1,"Dem Projektmanager."],
+["Which of these is a key element of the project charter?",["Stakeholders and roles","Float of each activity","Release of personnel","Sprint backlog"],0,"Stakeholders and roles."],
+["The charter template includes a \"summary milestone schedule\". This means the charter contains:",["A detailed CPM calculation","High-level milestones","The final lessons learned","Daily task assignments"],1,"Nur eine Zusammenfassung der Meilensteine."],
+["\"Level of authority\" in the charter template refers to the authority of the:",["Project manager","Regulator","Customer","Supplier"],0,"Steht im Template direkt neben Project Manager."],
+["Which element appears both as a separate document and as a key element of the charter?",["Business case","WBS","Network diagram","Lessons learned"],0,"Der Business case ist ein Element der Charter."],
+["Without an approved charter, the project manager:",["Lacks formal authority to use organizational resources","Can still spend any budget","Has finished initiation","Must skip planning"],0,"Die Charter gibt erst die Befugnis."],
+["\"Pre-assigned resources\" is a field in the:",["Project charter template","Scope statement","WBS","Network diagram"],0,"Feld 8 im Charter-Template."],
+["\"Risks, assumptions and constraints\" are part of:",["The project charter","The lessons-learned document","The critical path","Operations"],0,"Key element der Charter."]
+]},
+/* ---------------------------------------------------------------- 2.2 */
+{ id: "2.2", ch: "k2", title: "Project requirements",
+learn: `
+<p class="lead">Requirements sind die konkreten Bedingungen, Aufgaben und Features, die ein Projekt liefern muss, um als Erfolg zu gelten.</p>
+<h3>Die Pyramide: von oben (high level) nach unten (detailed)</h3>
+<table><tr><th>Ebene</th><th>Sicht</th><th>Inhalt</th></tr>
+<tr><td>Business requirements</td><td>Sponsor</td><td>Scope of the project, business objectives</td></tr>
+<tr><td>User requirements</td><td>User</td><td>User goals, user input and output</td></tr>
+<tr><td>System requirements</td><td>System</td><td>Functional: <b>what</b> the system does. Non-functional: <b>how well</b> it does it</td></tr></table>
+<h3>Beispiele</h3>
+<table><tr><th>Aussage</th><th>Typ</th></tr>
+<tr><td>Online-Umsatz um 15 % steigern</td><td>Business</td></tr>
+<tr><td>Kunde will seine Bestellhistorie sehen</td><td>User</td></tr>
+<tr><td>App erlaubt Passwort-Reset per E-Mail</td><td>Functional</td></tr>
+<tr><td>Seite lädt in unter 2 Sekunden, 99,9 % Verfügbarkeit</td><td>Non-functional</td></tr></table>
+<p>Die Folie mit den zwei Sneakern (High und Low) zeigt: gleiche Grundidee, aber andere Requirements ergeben ein anderes Produkt.</p>`,
+q: [
+["Business requirements reflect whose point of view?",["The user","The sponsor","The system","The supplier"],1,"Sponsor."],
+["\"The login page loads in under 2 seconds\" is a:",["Business requirement","User requirement","Functional requirement","Non-functional requirement"],3,"How well = non-functional."],
+["Functional requirements describe:",["How well the system performs","What the system does","The sponsor's objectives","The budget"],1,"What the system does."],
+["User requirements focus on:",["Business objectives","User goals and user input and output","Server performance","Budget approval"],1,"User goals, input und output."],
+["From high level to detailed, the order of requirement types is:",["System, user, business","Business, user, system","User, business, system","Business, system, user"],1,"Business oben, System unten."],
+["Which requirement type is the most detailed?",["Business requirements","User requirements","System requirements","Strategic requirements"],2,"System requirements."],
+["\"The app lets users reset their password by e-mail\" is a:",["Functional requirement","Non-functional requirement","Business requirement","Constraint"],0,"Beschreibt was das System tut."],
+["\"The system must be available 99.9% of the time\" is a:",["Functional requirement","Non-functional requirement","User requirement","Business requirement"],1,"Wie gut = non-functional."],
+["\"Increase online sales by 15% next year\" is a:",["Business requirement","User requirement","System requirement","Non-functional requirement"],0,"Geschäftsziel aus Sponsorsicht."],
+["\"A customer wants to see their order history\" is a:",["Business requirement","User requirement","Non-functional requirement","Constraint"],1,"Nutzerziel."],
+["Project requirements are defined as:",["The specific conditions, tasks and features a project must deliver to be considered a success","The project's budget only","The list of stakeholders","The schedule baseline"],0,"Definition von der Folie."]
+]},
+/* ---------------------------------------------------------------- 2.3 */
+{ id: "2.3", ch: "k2", title: "Scope statement und WBS",
+learn: `
+<p class="lead">Das Scope statement beschreibt in Worten, was zum Projekt gehört. Die WBS zerlegt diese Arbeit in eine Hierarchie.</p>
+<div class="def"><span>Scope statement</span>A detailed narrative document that defines the boundaries, goals and deliverables of a project. It ensures alignment among all stakeholders before execution begins.</div>
+<p>7 Bestandteile: Objectives, Deliverables, Boundaries, Inclusions, <b>Exclusions</b>, Requirements, Constraints.</p>
+<div class="def"><span>WBS</span>A hierarchical, deliverable-oriented decomposition of the total project scope into smaller, manageable pieces.</div>
+<p>Ebenen: Project, Subproject, Subtask, <b>Work package</b> (unterste Ebene).</p>
+<h3>Aktivität: Charity Concert</h3>
+<table><tr><th>Subproject</th><th>Work packages</th></tr>
+<tr><td>Logistics &amp; Venue</td><td>Security Staff, Hire Food Trucks, Sound System Setup, Set up Stage Lighting, Book Musicians</td></tr>
+<tr><td>Marketing &amp; Promotion</td><td>Sell Tickets, Create Event Instagram Account, Print Physical Flyers</td></tr></table>
+<p>Nur "Logistics &amp; Venue" und "Marketing &amp; Promotion" sind in der Liste als Subprojects formuliert. Man kann Musicians, Sound und Lighting auch als drittes Subproject "Performance" sauberer trennen.</p>
+<div class="trap"><b>Falle:</b> Scope statement = Text (narrative). WBS = Hierarchie (deliverable-oriented). Charter = Autorisierung.</div>`,
+q: [
+["A detailed narrative document defining the boundaries, goals and deliverables of a project is the:",["WBS","Scope statement","Project charter","Network diagram"],1,"Scope statement."],
+["Which is one of the components of a scope statement shown in the course?",["Exclusions","Float","Critical path","Release of personnel"],0,"Objectives, Deliverables, Boundaries, Inclusions, Exclusions, Requirements, Constraints."],
+["The WBS is best described as:",["A chronological list of tasks","A hierarchical, deliverable-oriented decomposition of the project scope","A budget table","A list of stakeholders"],1,"Wörtlich von der Folie."],
+["The lowest level of a WBS is the:",["Subproject","Subtask","Work package","Milestone"],2,"Work package."],
+["In the charity concert WBS, \"Print physical flyers\" belongs under:",["Logistics and Venue","Marketing and Promotion","Sound System Setup","Security Staff"],1,"Promotion."],
+["In the charity concert WBS, \"Sell tickets\" belongs under:",["Logistics and Venue","Marketing and Promotion","Security Staff","Hire Food Trucks"],1,"Ticketverkauf ist Promotion und Umsatz."],
+["In the charity concert WBS, \"Security staff\" belongs under:",["Marketing and Promotion","Logistics and Venue","Create Event Instagram Account","Sell Tickets"],1,"Logistik vor Ort."],
+["In the charity concert WBS, \"Hire food trucks\" belongs under:",["Marketing and Promotion","Logistics and Venue","Print Physical Flyers","Sell Tickets"],1,"Logistik vor Ort."],
+["Which item from the charity concert list is a subproject rather than a work package?",["Sell Tickets","Marketing and Promotion","Print Physical Flyers","Hire Food Trucks"],1,"Marketing & Promotion fasst mehrere Work packages zusammen."],
+["The scope statement ensures ... before execution begins.",["alignment among all stakeholders","the release of personnel","the calculation of float","the closing of the project"],0,"Alignment unter allen Stakeholdern."],
+["The WBS is oriented around:",["Deliverables","People","Costs only","Time only"],0,"Deliverable-oriented."],
+["The part of a scope statement that lists what is NOT included in the project is:",["Inclusions","Exclusions","Objectives","Deliverables"],1,"Exclusions."],
+["What is the correct order of WBS levels from top to bottom?",["Project, Subproject, Subtask, Work package","Work package, Subtask, Subproject, Project","Project, Work package, Subtask, Subproject","Subproject, Project, Subtask, Work package"],0,"Project oben, Work package unten."],
+["How do the scope statement and the WBS differ in form?",["Both are tables","Scope statement is narrative, WBS is hierarchical","Scope statement is a diagram, WBS is a text","There is no difference"],1,"Text vs. Hierarchie."]
+]},
+/* ---------------------------------------------------------------- 2.4 */
+{ id: "2.4", ch: "k2", title: "Network logic",
+learn: `
+<p class="lead">Network logic ist die Karte der Abhängigkeiten: Was muss nacheinander passieren, was kann parallel laufen?</p>
+<h3>Beispiel der Folie: Konferenz organisieren</h3>
+<table><tr><th>Aktivität</th><th>Beschreibung</th><th>Vorgänger</th></tr>
+<tr><td>A</td><td>Select venue</td><td>keiner</td></tr>
+<tr><td>B</td><td>Invite speakers</td><td>keiner</td></tr>
+<tr><td>C</td><td>Design communication materials</td><td>A</td></tr>
+<tr><td>D</td><td>Launch promotion</td><td>C</td></tr>
+<tr><td>E</td><td>Confirm logistics</td><td>A</td></tr>
+<tr><td>F</td><td>Hold conference</td><td>B, D, E</td></tr></table>
+<div class="net">
+<svg viewBox="0 0 340 170" role="img" aria-label="Netzwerk der Konferenz">
+<defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" class="ah"/></marker></defs>
+<g class="ln"><path d="M70 85H95" marker-end="url(#ar)"/><path d="M135 75L165 40" marker-end="url(#ar)"/><path d="M140 85H180" marker-end="url(#ar)"/><path d="M210 30H235" marker-end="url(#ar)"/><path d="M280 40L300 70" marker-end="url(#ar)"/><path d="M225 85H285" marker-end="url(#ar)"/><path d="M70 145H310V102" marker-end="url(#ar)"/></g>
+<g class="nd"><rect x="10" y="70" width="60" height="30" rx="6"/><rect x="95" y="70" width="45" height="30" rx="6"/><rect x="165" y="15" width="45" height="30" rx="6"/><rect x="235" y="15" width="45" height="30" rx="6"/><rect x="180" y="70" width="45" height="30" rx="6"/><rect x="285" y="70" width="45" height="30" rx="6"/><rect x="10" y="130" width="60" height="30" rx="6"/></g>
+<g class="tx"><text x="40" y="89">Start</text><text x="117" y="89">A</text><text x="187" y="34">C</text><text x="257" y="34">D</text><text x="202" y="89">E</text><text x="307" y="89">F</text><text x="40" y="149">B</text></g>
+<path d="M40 100V130" class="ln2" marker-end="url(#ar)"/>
+</svg></div>
+<p>A und B starten parallel. C und E hängen beide nur von A ab, also laufen sie parallel. F ist ein Zusammenführungspunkt (merge) mit drei Vorgängern.</p>
+<div class="mem"><b>Begriffe:</b> Dependencies = Vorgänger-Beziehungen. Abhängige Tasks müssen in fester Reihenfolge laufen, unabhängige gleichzeitig.</div>`,
+q: [
+["Network logic determines:",["Which tasks depend on others and which can run at the same time","The budget of each task","Who the sponsor is","The project's ROI"],0,"Abhängigkeiten und Parallelität."],
+["Conference network: which activities must finish before F (hold conference)?",["A only","B, D and E","C and D","A, B and C"],1,"F braucht B, D und E."],
+["Conference network: which activity can run in parallel with E (confirm logistics)?",["A Select venue","F Hold conference","C Design communication materials","None"],2,"C und E hängen beide nur von A ab."],
+["Conference network: what is the predecessor of C (design communication materials)?",["B","A","D","None"],1,"C kommt nach A."],
+["Conference network: what is the predecessor of D (launch promotion)?",["A","B","C","E"],2,"D kommt nach C."],
+["Conference network: which activities have no predecessor?",["A and B","A only","B and E","C and E"],0,"A und B starten direkt."],
+["Tasks that must happen in a specific sequence are called:",["Parallel tasks","Dependent tasks","Floating tasks","Closed tasks"],1,"Dependencies bestimmen die Reihenfolge."],
+["Lasagna example: which tasks can start at time 0?",["Boil noodles, brown the meat, mix cheese filling","Only boil noodles","Layer lasagna and bake","Drain noodles and add sauce"],0,"Diese drei haben keinen Vorgänger."],
+["Conference network: B (invite speakers) leads directly to:",["C","D","E","F"],3,"B ist direkter Vorgänger von F."],
+["In network logic, \"dependencies\" refer to:",["Predecessor relationships between activities","Budget lines","Stakeholder groups","Sprint lengths"],0,"Wer muss vor wem fertig sein."]
+]},
+/* ---------------------------------------------------------------- 2.5 */
+{ id: "2.5", ch: "k2", title: "Critical Path Method rechnen",
+learn: `
+<p class="lead">Der Critical Path ist die längste Kette abhängiger Aktivitäten. Seine Länge ist die minimale Projektdauer.</p>
+<h3>Regeln Forward pass (Folie)</h3>
+<table><tr><th>Fall</th><th>Regel</th></tr>
+<tr><td>Kein Vorgänger</td><td>ES = 0</td></tr>
+<tr><td>Ein Vorgänger</td><td>ES = EF des Vorgängers</td></tr>
+<tr><td>Mehrere Vorgänger</td><td>ES = <b>größter</b> EF der Vorgänger</td></tr>
+<tr><td>Immer</td><td>EF = ES + Dauer</td></tr></table>
+<h3>Backward pass (für Float)</h3>
+<p>LF der letzten Aktivität = ihr EF. LF einer Aktivität = kleinster LS ihrer Nachfolger. LS = LF minus Dauer. <b>Float = LS minus ES</b>. Float 0 heißt kritisch.</p>
+<h3>Beispiel 1: Lasagne (Minuten)</h3>
+<table><tr><th>Task</th><th>Dauer</th><th>Vorgänger</th><th>ES</th><th>EF</th><th>Float</th></tr>
+<tr><td>Boil noodles</td><td>25</td><td>keiner</td><td>0</td><td>25</td><td>0</td></tr>
+<tr><td>Drain noodles</td><td>2</td><td>Boil</td><td>25</td><td>27</td><td>0</td></tr>
+<tr><td>Brown the meat</td><td>8</td><td>keiner</td><td>0</td><td>8</td><td>18</td></tr>
+<tr><td>Add red sauce</td><td>1</td><td>Brown</td><td>8</td><td>9</td><td>18</td></tr>
+<tr><td>Mix cheese filling</td><td>5</td><td>keiner</td><td>0</td><td>5</td><td>22</td></tr>
+<tr><td>Layer lasagna</td><td>12</td><td>Drain, Sauce, Cheese</td><td>27</td><td>39</td><td>0</td></tr>
+<tr><td>Bake lasagna</td><td>45</td><td>Layer</td><td>39</td><td>84</td><td>0</td></tr></table>
+<p>Layer startet bei max(27, 9, 5) = 27. Critical path: Boil, Drain, Layer, Bake = <b>84 min</b>.</p>
+<h3>Beispiel 2: Student conference (Tage)</h3>
+<table><tr><th>Task</th><th>Dauer</th><th>Vorg.</th><th>ES</th><th>EF</th><th>LS</th><th>LF</th><th>Float</th></tr>
+<tr><td>A Choose topic</td><td>1</td><td>keiner</td><td>0</td><td>1</td><td>0</td><td>1</td><td>0</td></tr>
+<tr><td>B Research</td><td>3</td><td>A</td><td>1</td><td>4</td><td>1</td><td>4</td><td>0</td></tr>
+<tr><td>C Prepare slides</td><td>2</td><td>B</td><td>4</td><td>6</td><td>4</td><td>6</td><td>0</td></tr>
+<tr><td>D Design poster</td><td>2</td><td>A</td><td>1</td><td>3</td><td>4</td><td>6</td><td>3</td></tr>
+<tr><td>E Practice</td><td>1</td><td>C, D</td><td>6</td><td>7</td><td>6</td><td>7</td><td>0</td></tr></table>
+<p>Critical path A, B, C, E = <b>7 Tage</b>. D hat 3 Tage Float.</p>
+<div class="trap"><b>Falle:</b> Der kritische Pfad ist der <b>längste</b>, nicht der kürzeste. Eine Verzögerung innerhalb des Floats ändert die Projektdauer nicht. Eine Verzögerung auf dem kritischen Pfad verlängert das Projekt um genau diese Zeit.</div>
+<p class="hint">In den Quizzen kommen zusätzlich neu erzeugte Netze vor. Rechne sie mit diesen Regeln.</p>`,
+q: [
+["The critical path is:",["The shortest sequence of tasks","The longest sequence of dependent tasks","The cheapest sequence","The tasks with the most float"],1,"Der längste Pfad bestimmt die minimale Dauer."],
+["What is the float of a task on the critical path?",["Zero","Equal to its duration","Always positive","Equal to the project duration"],0,"Kritische Tasks haben keinen Float."],
+["An activity has no predecessor. Its earliest start (ES) is:",["0","1","Its duration","The project end"],0,"ES = 0."],
+["An activity has three predecessors with EF = 5, 9 and 27. Its ES is:",["5","9","27","41"],2,"Größter EF."],
+["An activity has ES = 4 and a duration of 2. Its EF is:",["2","4","6","8"],2,"EF = ES + Dauer."],
+["Lasagna example: total duration?",["71 min","84 min","98 min","45 min"],1,"25 + 2 + 12 + 45 = 84."],
+["Lasagna example: when can \"Layer lasagna\" start at the earliest?",["Minute 5","Minute 9","Minute 27","Minute 39"],2,"max(27, 9, 5) = 27."],
+["Lasagna example: browning the meat takes 10 minutes longer than planned. New total time?",["84 min","94 min","86 min","74 min"],0,"Brown hat 18 min Float, das Ende bleibt bei 84."],
+["Lasagna example: how much float does \"Mix cheese filling\" have?",["0 min","5 min","22 min","27 min"],2,"ES 0, spätester Start 27 minus 5 = 22."],
+["Lasagna example: baking takes 5 minutes longer. New total time?",["84 min","89 min","79 min","94 min"],1,"Bake ist kritisch, also 84 + 5 = 89."],
+["Lasagna example: what is the EF of \"Drain noodles\"?",["2","25","27","29"],2,"ES 25 + 2 = 27."],
+["Student conference: A 1 day; B 3 after A; C 2 after B; D 2 after A; E 1 after C and D. Project duration?",["6 days","7 days","8 days","9 days"],1,"1 + 3 + 2 + 1 = 7."],
+["Student conference: what is the critical path?",["A, D, E","A, B, C, E","A, B, D, E","B, C, D"],1,"A, B, C, E."],
+["Student conference: how much float does D (design poster) have?",["0 days","1 day","2 days","3 days"],3,"LS 4 minus ES 1 = 3."],
+["Student conference: what is the earliest start of E?",["3","4","6","7"],2,"max(6, 3) = 6."],
+["Student conference: research (B) takes 2 days longer. New project duration?",["7 days","8 days","9 days","5 days"],2,"B ist kritisch, also 7 + 2 = 9."],
+["Student conference: the poster (D) takes 2 days longer. New project duration?",["7 days","9 days","8 days","6 days"],0,"D hat 3 Tage Float, 2 Tage Verzögerung passen hinein."],
+["Float (slack) is:",["The time a task can be delayed without delaying the project end","The duration of the longest task","The cost overrun","The number of predecessors"],0,"Definition von Float."],
+["Float is calculated as:",["ES + duration","LS minus ES","EF minus duration","LF plus LS"],1,"Float = LS minus ES (oder LF minus EF)."],
+["The main purpose of CPM is to find:",["The minimum total time required to complete the project","The cheapest supplier","The project sponsor","The business case"],0,"CPM bestimmt die minimale Projektdauer."]
+]}
+];
+
+// ---------- utilities ----------
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const LET = ["A","B","C","D"];
+const QUIZ_COUNT = 20, QUIZ_LEN = 25, QUIZ_GEN = 3;
+
+function rng(seed){ let s = seed >>> 0 || 1; return () => { s ^= s << 13; s >>>= 0; s ^= s >> 17; s ^= s << 5; s >>>= 0; return s / 4294967296; }; }
+function shuffle(a, r = Math.random){ a = a.slice(); for (let i = a.length - 1; i > 0; i--){ const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; }
+
+// ---------- storage ----------
+const KEY = "pm-midterm-v1";
+let P = (() => { try { return JSON.parse(localStorage.getItem(KEY)) || {}; } catch(e){ return {}; } })();
+P.learn = P.learn || {}; P.quiz = P.quiz || {}; P.wrong = P.wrong || [];
+function persist(){ try { localStorage.setItem(KEY, JSON.stringify(P)); } catch(e){} }
+
+// ---------- question pool ----------
+const POOL = [];
+SECTIONS.forEach(s => s.q.forEach((q, i) => POOL.push({ key: s.id + "#" + i, sec: s.id, q: q[0], opts: q[1], c: q[2], why: q[3] })));
+const BYKEY = Object.fromEntries(POOL.map(p => [p.key, p]));
+const SEC = Object.fromEntries(SECTIONS.map(s => [s.id, s]));
+
+// ---------- CPM generator ----------
+const TEMPLATES = [
+  { A: [], B: ["A"], C: ["A"], D: ["B","C"], E: ["D"] },
+  { A: [], B: [], C: ["A"], D: ["A","B"], E: ["C","D"] },
+  { A: [], B: ["A"], C: ["A"], D: ["B"], E: ["C","D"] },
+  { A: [], B: [], C: ["A"], D: ["B"], E: ["C"], F: ["D","E"] },
+  { A: [], B: ["A"], C: ["B"], D: ["A"], E: ["C","D"] },
+  { A: [], B: [], C: ["A","B"], D: ["A"], E: ["C"], F: ["D","E"] }
+];
+function solveNet(pred, dur){
+  const ids = Object.keys(pred), es = {}, ef = {};
+  ids.forEach(id => { es[id] = Math.max(0, ...pred[id].map(p => ef[p])); ef[id] = es[id] + dur[id]; });
+  const total = Math.max(...ids.map(id => ef[id]));
+  const succ = Object.fromEntries(ids.map(id => [id, ids.filter(j => pred[j].includes(id))]));
+  const lf = {}, ls = {};
+  ids.slice().reverse().forEach(id => { lf[id] = succ[id].length ? Math.min(...succ[id].map(s => ls[s])) : total; ls[id] = lf[id] - dur[id]; });
+  const fl = Object.fromEntries(ids.map(id => [id, ls[id] - es[id]]));
+  // all start-to-end paths
+  const paths = [];
+  const walk = (id, path) => { const p = [...path, id]; if (!succ[id].length) paths.push(p); else succ[id].forEach(s => walk(s, p)); };
+  ids.filter(id => !pred[id].length).forEach(id => walk(id, []));
+  const plen = p => p.reduce((a, id) => a + dur[id], 0);
+  return { ids, es, ef, ls, lf, fl, total, succ, paths: paths.map(p => ({ p, len: plen(p) })) };
+}
+function makeNet(r){
+  for (let tries = 0; tries < 200; tries++){
+    const pred = TEMPLATES[Math.floor(r() * TEMPLATES.length)];
+    const dur = Object.fromEntries(Object.keys(pred).map(id => [id, 1 + Math.floor(r() * 9)]));
+    const S = solveNet(pred, dur);
+    const lens = S.paths.map(x => x.len).sort((a, b) => b - a);
+    if (lens.length > 1 && lens[0] !== lens[1] && Object.values(S.fl).some(f => f >= 2)) return { pred, dur, S };
+  }
+}
+function distinct(correct, cands, r){
+  const out = [correct];
+  for (const c of cands){ if (out.length === 4) break; if (c >= 0 && !out.includes(c)) out.push(c); }
+  let k = 1; while (out.length < 4){ const c = correct + k * (out.length % 2 ? 1 : -1) + (k > 3 ? k : 0); if (c >= 0 && !out.includes(c)) out.push(c); k++; }
+  return out;
+}
+function genQuestion(r, unit){
+  const { pred, dur, S } = makeNet(r);
+  const ids = S.ids;
+  const net = ids.map(id => ({ id, d: dur[id], p: pred[id] }));
+  const cp = S.paths.find(x => x.len === S.total).p;
+  const solution = `ES/EF: ${ids.map(id => `${id} ${S.es[id]}/${S.ef[id]}`).join(", ")}. Critical path ${cp.join(", ")} = ${S.total}. Float: ${ids.map(id => `${id} ${S.fl[id]}`).join(", ")}.`;
+  const merges = ids.filter(id => pred[id].length > 1);
+  const nonCrit = ids.filter(id => S.fl[id] > 0);
+  const types = ["duration", "merge", "float", "path", "delay"];
+  const t = types[Math.floor(r() * types.length)];
+  let q, vals, why;
+  if (t === "duration" || (t === "merge" && !merges.length)){
+    const second = S.paths.map(x => x.len).sort((a, b) => b - a)[1];
+    const sumAll = ids.reduce((a, id) => a + dur[id], 0);
+    vals = distinct(S.total, [second, sumAll, S.total + 1, S.total - 2], r);
+    q = `What is the minimum project duration (in ${unit})?`;
+    why = `Der längste Pfad bestimmt die Dauer. ${solution}`;
+  } else if (t === "merge"){
+    const m = merges[Math.floor(r() * merges.length)];
+    const efs = pred[m].map(p => S.ef[p]);
+    vals = distinct(S.es[m], [Math.min(...efs), efs.reduce((a, b) => a + b, 0), S.es[m] + dur[m]], r);
+    q = `What is the earliest start (ES) of activity ${m}?`;
+    why = `${m} hat mehrere Vorgänger (${pred[m].join(", ")}), also den größten EF nehmen: max(${efs.join(", ")}) = ${S.es[m]}. ${solution}`;
+  } else if (t === "float" && nonCrit.length){
+    const a = nonCrit[Math.floor(r() * nonCrit.length)];
+    vals = distinct(S.fl[a], [0, S.fl[a] + dur[a], S.fl[a] + 1, S.fl[a] - 1], r);
+    q = `How much float does activity ${a} have (in ${unit})?`;
+    why = `Float = LS minus ES = ${S.ls[a]} minus ${S.es[a]} = ${S.fl[a]}. ${solution}`;
+  } else if (t === "delay" && nonCrit.length){
+    const a = nonCrit[Math.floor(r() * nonCrit.length)];
+    const k = 1 + Math.floor(r() * (S.fl[a] + 3));
+    const newDur = Object.assign({}, dur); newDur[a] += k;
+    const nt = solveNet(pred, newDur).total;
+    vals = distinct(nt, [S.total + k, S.total, nt + 1, S.total - k], r);
+    q = `Activity ${a} takes ${k} ${unit} longer than planned. What is the new project duration?`;
+    why = `${a} hat ${S.fl[a]} ${unit} Float. ${k <= S.fl[a] ? "Die Verzögerung passt in den Float, die Dauer bleibt " + S.total + "." : "Die Verzögerung übersteigt den Float um " + (k - S.fl[a]) + ", neue Dauer " + nt + "."} ${solution}`;
+  } else {
+    const opts = shuffle(S.paths.map(x => x.p.join(", ")), r);
+    const right = cp.join(", ");
+    const others = opts.filter(o => o !== right);
+    const fake = [ids.slice().join(", "), ids.filter(id => !cp.includes(id)).concat(cp.slice(-1)).join(", "), cp.slice(1).join(", ")];
+    const pool = [...others, ...fake].filter((o, i, a) => o && o !== right && a.indexOf(o) === i);
+    const options = [right, ...pool.slice(0, 3)];
+    while (options.length < 4) options.push(ids.slice().reverse().join(", ") + " ".repeat(options.length));
+    const order = shuffle([0,1,2,3], r);
+    return { gen: true, sec: "2.5", net, unit, q: "Which sequence is the critical path?", opts: order.map(i => options[i].trim()), c: order.indexOf(0), why: `Den längsten Pfad suchen: ${S.paths.map(x => x.p.join("-") + " = " + x.len).join("; ")}. ${solution}` };
+  }
+  const order = shuffle([0,1,2,3], r);
+  return { gen: true, sec: "2.5", net, unit, q, opts: order.map(i => String(vals[i])), c: order.indexOf(0), why };
+}
+
+// ---------- fixed quiz composition ----------
+const QUIZZES = (() => {
+  const target = QUIZ_LEN - QUIZ_GEN;
+  const sizes = SECTIONS.map(s => s.q.length), total = sizes.reduce((a, b) => a + b, 0);
+  const raw = sizes.map(n => n / total * target);
+  const alloc = raw.map(Math.floor);
+  let left = target - alloc.reduce((a, b) => a + b, 0);
+  raw.map((x, i) => [x - Math.floor(x), i]).sort((a, b) => b[0] - a[0]).slice(0, left).forEach(([, i]) => alloc[i]++);
+  const cycles = SECTIONS.map((s, i) => shuffle(s.q.map((_, j) => s.id + "#" + j), rng(1000 + i)));
+  const ptr = SECTIONS.map(() => 0);
+  const out = [];
+  for (let k = 0; k < QUIZ_COUNT; k++){
+    const keys = [];
+    SECTIONS.forEach((s, i) => { for (let n = 0; n < alloc[i]; n++){ keys.push(cycles[i][ptr[i] % cycles[i].length]); ptr[i]++; } });
+    out.push({ n: k + 1, keys: shuffle(keys, rng(5000 + k)), seed: 9000 + k * 7 });
+  }
+  return out;
+})();
+function buildQuizItems(qz){
+  const r = rng(qz.seed);
+  const items = qz.keys.map(k => BYKEY[k]);
+  const gens = Array.from({ length: QUIZ_GEN }, (_, i) => genQuestion(r, i % 2 ? "days" : "weeks"));
+  // spread generated questions through the quiz
+  [6, 14, 21].forEach((pos, i) => items.splice(pos, 0, gens[i]));
+  return items;
+}
+function shuffledCopy(item){
+  if (item.gen) return Object.assign({}, item);
+  const order = shuffle([0,1,2,3]);
+  return Object.assign({}, item, { opts: order.map(i => item.opts[i]), c: order.indexOf(item.c) });
+}
+
+// ---------- views ----------
+let tab = "learn";
+let run = null;
+
+function setTab(t){
+  tab = t; run = null;
+  document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === t)));
+  render();
+}
+function scrollTop(){ window.scrollTo(0, 0); }
+
+function render(){
+  const v = $("#view");
+  if (run) return renderRun(v);
+  if (tab === "learn") return renderLearnHome(v);
+  if (tab === "quiz") return renderQuizHome(v);
+  if (tab === "wrong") return renderWrong(v);
+}
+
+function pct(a, b){ return b ? Math.round(a / b * 100) : 0; }
+function badge(best){
+  if (best == null) return `<span class="pill">offen</span>`;
+  const cls = best >= 85 ? "good" : best >= 65 ? "mid" : "low";
+  return `<span class="pill ${cls}">${best} %</span>`;
+}
+
+function renderLearnHome(v){
+  const done = SECTIONS.filter(s => (P.learn[s.id] || {}).best >= 80).length;
+  v.innerHTML = `
+    <header class="top"><p class="eyebrow">ESCA · Project Management</p><h1>Lernen</h1>
+    <p class="sub">Jedes Teilkapitel erklärt erst den Stoff und fragt dich dann ab. Ab 80 % gilt es als sicher.</p>
+    <div class="meter"><i style="width:${pct(done, SECTIONS.length)}%"></i></div>
+    <p class="meta">${done} von ${SECTIONS.length} Teilkapiteln sicher</p></header>
+    ${CHAPTERS.map(ch => `
+      <section class="group"><h2>${ch.title}<small>${esc(ch.sub)}</small></h2>
+      <div class="list">${SECTIONS.filter(s => s.ch === ch.id).map(s => `
+        <button class="row" data-sec="${s.id}" type="button"><span class="num">${s.id}</span><span class="rt">${esc(s.title)}<small>${s.q.length} Fragen</small></span>${badge((P.learn[s.id] || {}).best)}</button>`).join("")}
+      </div></section>`).join("")}`;
+  v.querySelectorAll("[data-sec]").forEach(b => b.onclick = () => openSection(b.dataset.sec));
+}
+
+function openSection(id){
+  const s = SEC[id], v = $("#view"), i = SECTIONS.indexOf(s);
+  run = null;
+  v.innerHTML = `
+    <div class="bar"><button class="back" type="button" id="back">Übersicht</button><span>${s.id}</span></div>
+    <article class="learn"><p class="eyebrow">Teilkapitel ${s.id}</p><h1>${esc(s.title)}</h1>${s.learn}</article>
+    <div class="cta"><button class="btn" id="go" type="button">${s.q.length} Fragen zu ${s.id} starten</button>
+    ${i + 1 < SECTIONS.length ? `<button class="btn ghost" id="nx" type="button">Weiter zu ${SECTIONS[i + 1].id}</button>` : ""}</div>`;
+  $("#back").onclick = () => setTab("learn");
+  $("#go").onclick = () => startRun({ kind: "learn", id, title: `${s.id} ${s.title}`, items: shuffle(POOL.filter(p => p.sec === id)).map(shuffledCopy) });
+  const nx = $("#nx"); if (nx) nx.onclick = () => openSection(SECTIONS[i + 1].id);
+  scrollTop();
+}
+
+function renderQuizHome(v){
+  const tried = QUIZZES.filter(q => P.quiz[q.n]);
+  const avg = tried.length ? Math.round(tried.reduce((a, q) => a + P.quiz[q.n].best, 0) / tried.length) : null;
+  v.innerHTML = `
+    <header class="top"><p class="eyebrow">Midterm Trainer</p><h1>Quizze</h1>
+    <p class="sub">20 feste Probeklausuren mit je 25 Fragen aus allen Teilkapiteln. Jedes Quiz enthält 3 neu erzeugte CPM-Rechenaufgaben.</p>
+    <p class="meta">${tried.length} von 20 gemacht${avg != null ? ` · Schnitt der Bestwerte ${avg} %` : ""}</p></header>
+    <div class="grid">${QUIZZES.map(q => { const r = P.quiz[q.n]; return `
+      <button class="tile ${r ? (r.best >= 85 ? "good" : r.best >= 65 ? "mid" : "low") : ""}" data-q="${q.n}" type="button"><span class="tn">${q.n}</span><span class="ts">${r ? r.best + " %" : "neu"}</span><span class="tt">${r ? r.tries + "×" : "25 Fragen"}</span></button>`; }).join("")}</div>
+    <button class="btn ghost wide" id="rand" type="button">Zufallsquiz aus dem ganzen Pool</button>`;
+  v.querySelectorAll("[data-q]").forEach(b => b.onclick = () => {
+    const qz = QUIZZES[b.dataset.q - 1];
+    startRun({ kind: "quiz", n: qz.n, title: `Quiz ${qz.n}`, items: buildQuizItems(qz).map(shuffledCopy) });
+  });
+  $("#rand").onclick = () => {
+    const r = rng(Date.now() & 0xffffffff);
+    const items = shuffle(POOL).slice(0, QUIZ_LEN - QUIZ_GEN).map(shuffledCopy);
+    [5, 13, 20].forEach((pos, i) => items.splice(pos, 0, genQuestion(r, i % 2 ? "days" : "weeks")));
+    startRun({ kind: "random", title: "Zufallsquiz", items });
+  };
+}
+
+function renderWrong(v){
+  const keys = P.wrong.filter(k => BYKEY[k]);
+  const bySec = {};
+  keys.forEach(k => { const s = BYKEY[k].sec; bySec[s] = (bySec[s] || 0) + 1; });
+  v.innerHTML = `
+    <header class="top"><p class="eyebrow">Fehlertraining</p><h1>Offene Fehler</h1>
+    <p class="sub">Jede falsch beantwortete Frage landet hier. Richtig beantwortet verschwindet sie wieder.</p></header>
+    ${keys.length ? `
+      <div class="big">${keys.length}<small>Fragen offen</small></div>
+      <div class="list">${Object.keys(bySec).sort().map(s => `<button class="row" data-sec="${s}" type="button"><span class="num">${s}</span><span class="rt">${esc(SEC[s].title)}<small>Erklärung nochmal lesen</small></span><span class="pill low">${bySec[s]}</span></button>`).join("")}</div>
+      <button class="btn wide" id="go" type="button">Alle ${keys.length} Fehler üben</button>
+      <button class="btn ghost wide" id="clr" type="button">Liste leeren</button>
+      <p class="hint" id="clrHint" hidden>Nochmal tippen zum Bestätigen.</p>`
+    : `<div class="empty"><p><b>Keine offenen Fehler.</b></p><p>Mach ein Teilkapitel oder ein Quiz. Fragen, die du falsch beantwortest, sammeln sich hier.</p></div>`}`;
+  v.querySelectorAll("[data-sec]").forEach(b => b.onclick = () => { tab = "learn"; document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.tab === "learn"))); openSection(b.dataset.sec); });
+  const go = $("#go"); if (go) go.onclick = () => startRun({ kind: "wrong", title: "Fehlertraining", items: shuffle(keys.map(k => BYKEY[k])).map(shuffledCopy) });
+  const clr = $("#clr"); if (clr){ let armed = false; clr.onclick = () => { if (!armed){ armed = true; $("#clrHint").hidden = false; clr.textContent = "Wirklich leeren"; return; } P.wrong = []; persist(); render(); }; }
+}
+
+// ---------- run engine ----------
+function startRun(cfg){
+  run = Object.assign({ idx: 0, ok: 0, log: [], answered: false }, cfg);
+  render(); scrollTop();
+}
+function netTable(it){
+  return `<div class="nett"><table><tr><th>Activity</th><th>Duration (${it.unit})</th><th>Predecessors</th></tr>${it.net.map(n => `<tr><td>${n.id}</td><td>${n.d}</td><td>${n.p.length ? n.p.join(", ") : "none"}</td></tr>`).join("")}</table></div>`;
+}
+function renderRun(v){
+  if (run.idx >= run.items.length) return renderResult(v);
+  const it = run.items[run.idx], n = run.items.length;
+  v.innerHTML = `
+    <div class="bar"><button class="back" type="button" id="quit">Beenden</button><span>${esc(run.title)}</span></div>
+    <div class="prog"><i style="width:${pct(run.idx, n)}%"></i></div>
+    <div class="qhead"><span>Frage ${run.idx + 1} / ${n}</span><span>${it.gen ? "CPM-Rechnung" : esc(it.sec + " " + SEC[it.sec].title)}</span></div>
+    ${it.gen ? netTable(it) : ""}
+    <p class="q">${esc(it.q)}</p>
+    <div class="opts">${it.opts.map((o, i) => `<button class="opt" type="button" data-i="${i}"><span class="k">${LET[i]}</span><span>${esc(o)}</span></button>`).join("")}</div>
+    <div id="fb"></div>
+    <div class="cta"><button class="btn" id="next" type="button" hidden>Weiter</button></div>
+    <p class="hint score">Richtig ${run.ok} von ${run.idx}</p>`;
+  v.querySelectorAll(".opt").forEach(b => b.onclick = () => answer(+b.dataset.i));
+  $("#next").onclick = () => { run.idx++; run.answered = false; render(); scrollTop(); };
+  let armed = false;
+  $("#quit").onclick = () => { if (!armed){ armed = true; $("#quit").textContent = "Wirklich beenden?"; return; } const t = run.kind === "learn" ? "learn" : run.kind === "wrong" ? "wrong" : "quiz"; run = null; setTab(t); };
+}
+function answer(i){
+  if (run.answered) return;
+  run.answered = true;
+  const it = run.items[run.idx], right = i === it.c;
+  document.querySelectorAll(".opt").forEach((b, j) => { b.disabled = true; if (j === it.c) b.classList.add("right"); else if (j === i) b.classList.add("wrong"); });
+  if (right) run.ok++;
+  run.log.push({ it, picked: i, right });
+  if (!it.gen){
+    const at = P.wrong.indexOf(it.key);
+    if (right && at >= 0) P.wrong.splice(at, 1);
+    if (!right && at < 0) P.wrong.push(it.key);
+    persist();
+  }
+  $("#fb").innerHTML = `<div class="why ${right ? "" : "bad"}"><b>${right ? "Richtig." : "Falsch. Richtig ist " + LET[it.c] + ": " + esc(it.opts[it.c])}</b><span>${esc(it.why)}</span></div>`;
+  const n = $("#next"); n.hidden = false; n.textContent = run.idx + 1 < run.items.length ? "Weiter" : "Auswertung"; n.focus({ preventScroll: true });
+  $(".score").textContent = `Richtig ${run.ok} von ${run.idx + 1}`;
+}
+function renderResult(v){
+  const n = run.items.length, p = pct(run.ok, n);
+  if (run.kind === "learn"){ const r = P.learn[run.id] || {}; r.best = Math.max(r.best || 0, p); r.last = p; P.learn[run.id] = r; }
+  if (run.kind === "quiz"){ const r = P.quiz[run.n] || { tries: 0 }; r.best = Math.max(r.best || 0, p); r.last = p; r.tries++; P.quiz[run.n] = r; }
+  persist();
+  const bySec = {};
+  run.log.forEach(l => { const s = l.it.sec; bySec[s] = bySec[s] || { n: 0, ok: 0 }; bySec[s].n++; if (l.right) bySec[s].ok++; });
+  const weak = Object.keys(bySec).filter(s => bySec[s].ok / bySec[s].n < 0.7).sort();
+  const misses = run.log.filter(l => !l.right);
+  const verdict = p >= 85 ? "Sitzt. Das Niveau reicht für die Klausur." : p >= 65 ? "Solide. Schau dir die schwachen Teilkapitel nochmal an." : "Noch Lücken. Lies die schwachen Teilkapitel und übe die Fehler.";
+  const kind = run.kind, sid = run.id, qn = run.n;
+  v.innerHTML = `
+    <div class="bar"><button class="back" type="button" id="done">Fertig</button><span>${esc(run.title)}</span></div>
+    <div class="result"><div class="big">${p} %<small>${run.ok} von ${n} richtig</small></div><p>${verdict}</p></div>
+    ${kind !== "learn" ? `<table class="brk"><tr><th>Teilkapitel</th><th>Richtig</th></tr>${Object.keys(bySec).sort().map(s => `<tr class="${weak.includes(s) ? "weak" : ""}"><td>${s} ${esc(SEC[s].title)}</td><td class="n">${bySec[s].ok} / ${bySec[s].n}</td></tr>`).join("")}</table>` : ""}
+    ${weak.length && kind !== "learn" ? `<div class="list">${weak.map(s => `<button class="row" data-sec="${s}" type="button"><span class="num">${s}</span><span class="rt">${esc(SEC[s].title)}<small>Schwach, Erklärung lesen</small></span></button>`).join("")}</div>` : ""}
+    <div class="cta">
+      ${misses.length ? `<button class="btn" id="rm" type="button">${misses.length} Fehler direkt wiederholen</button>` : ""}
+      ${kind === "learn" && SECTIONS.indexOf(SEC[sid]) + 1 < SECTIONS.length ? `<button class="btn ${misses.length ? "ghost" : ""}" id="nx" type="button">Weiter zu ${SECTIONS[SECTIONS.indexOf(SEC[sid]) + 1].id}</button>` : ""}
+      ${kind === "quiz" && qn < QUIZ_COUNT ? `<button class="btn ${misses.length ? "ghost" : ""}" id="nq" type="button">Quiz ${qn + 1} starten</button>` : ""}
+    </div>
+    ${misses.length ? `<h2 class="rh">Deine Fehler</h2><div class="miss">${misses.map(l => `<div>${l.it.gen ? netTable(l.it) : ""}<p>${esc(l.it.q)}</p><p class="a"><b>Richtig:</b> ${esc(l.it.opts[l.it.c])}. ${esc(l.it.why)}</p></div>`).join("")}</div>` : ""}`;
+  const back = kind === "learn" ? "learn" : kind === "wrong" ? "wrong" : "quiz";
+  $("#done").onclick = () => setTab(back);
+  v.querySelectorAll("[data-sec]").forEach(b => b.onclick = () => { run = null; tab = "learn"; document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", String(t.dataset.tab === "learn"))); openSection(b.dataset.sec); });
+  const rm = $("#rm"); if (rm) rm.onclick = () => startRun({ kind: "wrong", title: "Fehler wiederholen", items: misses.map(l => shuffledCopy(l.it)) });
+  const nx = $("#nx"); if (nx) nx.onclick = () => { run = null; openSection(SECTIONS[SECTIONS.indexOf(SEC[sid]) + 1].id); };
+  const nq = $("#nq"); if (nq) nq.onclick = () => { const qz = QUIZZES[qn]; startRun({ kind: "quiz", n: qz.n, title: `Quiz ${qz.n}`, items: buildQuizItems(qz).map(shuffledCopy) }); };
+  run = null;
+  scrollTop();
+}
+
+// keyboard support for desktop
+document.addEventListener("keydown", e => {
+  if (!run || run.idx >= run.items.length) return;
+  const m = { "1":0, "2":1, "3":2, "4":3, "a":0, "b":1, "c":2, "d":3 };
+  const k = e.key.toLowerCase();
+  if (!run.answered && k in m){ answer(m[k]); e.preventDefault(); }
+  else if (run.answered && k === "enter"){ $("#next").click(); e.preventDefault(); }
+});
+
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => setTab(b.dataset.tab));
+render();
+
+if ("serviceWorker" in navigator && location.protocol === "https:" && !/claude/.test(location.hostname)){
+  try { navigator.serviceWorker.register("./sw.js").catch(() => {}); } catch(e){}
+}
+
+</script>
+</body>
+</html>
