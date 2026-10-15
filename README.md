@@ -1,24 +1,24 @@
 # PM Midterm Trainer
 
-Lern-App für die Project-Management-Midterm an der ESCA (Kapitel 1 und 2).
+Study app for the Project Management midterm at ESCA (chapters 1 and 2).
 
-Lernen: 13 Teilkapitel mit Erklärung und Fragen.
-Quizze: 20 Probeklausuren mit je 25 Fragen, davon 3 neu erzeugte CPM-Rechnungen.
-Fehler: alle falsch beantworteten Fragen zum gezielten Wiederholen.
+Learn: 13 sections, each with an explanation and questions.
+Quizzes: 20 practice exams with 25 questions each, including 3 newly generated CPM calculations.
+Mistakes: every question you got wrong, for targeted review.
 
-Der Fortschritt wird nur lokal auf dem Gerät gespeichert. Die App läuft nach dem ersten Öffnen auch offline.
+Progress is stored only on your device. After the first visit the app also works offline.
 
-## Auf GitHub Pages veröffentlichen
+## Publish on GitHub Pages
 
-1. Auf github.com ein neues öffentliches Repository anlegen, z.B. `pm-midterm`.
-2. "uploading an existing file" wählen und alle Dateien aus diesem Ordner hochladen, inklusive Ordner `icons` und Datei `.nojekyll`.
-3. Settings > Pages > Source: "Deploy from a branch", Branch `main`, Ordner `/ (root)`, Save.
-4. Nach ein bis zwei Minuten ist die App erreichbar unter `https://<dein-name>.github.io/pm-midterm/`.
+1. Create a new public repository on github.com, e.g. `pm-midterm`.
+2. Choose "uploading an existing file" and upload all files from this folder, including the `icons` folder.
+3. Settings > Pages > Source: "Deploy from a branch", branch `main`, folder `/ (root)`, Save.
+4. After one or two minutes the app is live at `https://<your-name>.github.io/pm-midterm/`.
 
-## Auf den iPhone-Homescreen
+## Add to the iPhone home screen
 
-1. Die Adresse in **Safari** öffnen.
-2. Teilen-Symbol antippen, dann "Zum Home-Bildschirm".
-3. Die App startet dann im Vollbild ohne Browserleiste.
+1. Open the address in **Safari**.
+2. Tap the share icon, then "Add to Home Screen".
+3. The app then opens full screen without the browser bar.
 
-Hinweis: Der Fortschritt in der Homescreen-App ist getrennt von dem in Safari.
+Note: progress in the home screen app is separate from progress in Safari.

@@ -1,13 +1,13 @@
 {
   "name": "PM Midterm Trainer",
   "short_name": "PM Midterm",
-  "description": "Lernen und Quizze f\u00fcr die Project-Management-Midterm an der ESCA",
+  "description": "Study and quizzes for the Project Management midterm at ESCA",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "background_color": "#F2F5F3",
   "theme_color": "#0B4D3C",
-  "lang": "de",
+  "lang": "en",
   "icons": [
     {
       "src": "icons/icon-192.png",
